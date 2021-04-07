@@ -1,16 +1,24 @@
-package e.aman.demo;
+package e.aman.demo.controllers;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
+import org.springframework.http.CacheControl;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import e.aman.demo.models.Employee;
+import e.aman.demo.repositories.EmployeeRepo;
 
 @RestController
 @RequestMapping("api")
@@ -24,8 +32,12 @@ public class EmpController {
 	/*
 	 * To get the list of all employees
 	 * */
+	
+	
+	
 	@GetMapping("/employees")
-	public CollectionModel<Employee> getEmployees() {
+	@PreAuthorize("hasAnyRole('ROLE_USER')")
+	public ResponseEntity<CollectionModel<Employee>> getEmployees() {
 		List<Employee> list =  empRepo.findAll();
 		
 		for(Employee e : list) {
@@ -38,7 +50,7 @@ public class EmpController {
 		
 		Link selfLink = linkTo(methodOn(EmpController.class).getEmployees()).withSelfRel();
 		Link rootLink = linkTo(EmpController.class).withRel("root");
-		return CollectionModel.of(list , selfLink , rootLink);
+		return ResponseEntity.ok().cacheControl(CacheControl.maxAge(600, TimeUnit.SECONDS)).body(CollectionModel.of(list , selfLink , rootLink));
 	}
 	
 	 
@@ -69,6 +81,7 @@ public class EmpController {
 			e1.add(selfLink);
 		return e1;
 	}
+	
 	
 
 }

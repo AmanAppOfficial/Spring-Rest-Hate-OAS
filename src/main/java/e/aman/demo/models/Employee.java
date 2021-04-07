@@ -1,4 +1,4 @@
-package e.aman.demo;
+package e.aman.demo.models;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.CacheControl;
@@ -35,11 +37,14 @@ public class EmpController {
 	 * */
 	
 	
-	
+	/*
+	 * Pagination support where pageSize defines the 
+	 * number of objects and pageNumber defines the Elements of which page
+	 * */
 	@GetMapping("/employees")
 	@PreAuthorize("hasAnyRole('ROLE_USER')")
-	public ResponseEntity<CollectionModel<Employee>> getEmployees() {
-		List<Employee> list =  empRepo.findAll();
+	public ResponseEntity<CollectionModel<Employee>> getEmployees(Pageable page) {
+		Page<Employee> list =  empRepo.findAll(page);
 		
 		for(Employee e : list) {
 			/**
@@ -49,7 +54,7 @@ public class EmpController {
 		e.add(selfLink);
 		}
 		
-		Link selfLink = linkTo(methodOn(EmpController.class).getEmployees()).withSelfRel();
+		Link selfLink = linkTo(methodOn(EmpController.class).getEmployees(page)).withSelfRel();
 		Link rootLink = linkTo(EmpController.class).withRel("root");
 		return ResponseEntity.ok().cacheControl(CacheControl.maxAge(600, TimeUnit.SECONDS)).body(CollectionModel.of(list , selfLink , rootLink));
 	}

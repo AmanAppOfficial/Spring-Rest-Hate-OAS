@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import e.aman.demo.exceptions.CustomNullPointerException;
 import e.aman.demo.models.Employee;
 import e.aman.demo.repositories.EmployeeRepo;
 
@@ -65,8 +66,7 @@ public class EmpController {
 		
 		
 		 if(!e.isPresent()) {
-			System.out.print("NA");
-			return null;
+			throw new CustomNullPointerException("Not Found Custom Message");
 		}
 		 
 		 Employee e1 = new Employee();
